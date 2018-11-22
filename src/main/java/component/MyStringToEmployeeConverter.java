@@ -8,7 +8,7 @@ import org.springframework.core.convert.converter.Converter;
  *
  * 请求 到达Controller时 进行预处理
  * S：Source T：Target 将s转为t
- * 
+ * key: String_Employee   value:MyStringToEmployeeConverter 然后注册到容器当中
  * @author lfy
  * 
  */
