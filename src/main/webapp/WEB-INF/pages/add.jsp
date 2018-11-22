@@ -32,11 +32,18 @@
 			1）、当做原生的name项
 			2）、自动回显隐含模型中某个对象对应的这个属性的值
 	-->
-	lastName:<form:input path="lastName"/><br/>
-	email:<form:input path="email"/><br/>
+	lastName:<form:input path="lastName"/>
+		<form:errors path="lastName"/>-->${errorInfo.lastName }
+	<br/>
+	email:<form:input path="email"/>
+		<form:errors path="email"/>-->${errorInfo.email }
+		<br/>
 	gender:<br/>
 		男：<form:radiobutton path="gender" value="1"/><br/>
 		女：<form:radiobutton path="gender" value="0"/><br/>
+	birth:<form:input path="birth"/>
+		<form:errors path="birth"/>--->${errorInfo.birth }
+		<br/>
 	dept:
 		<!-- 
 		items=""：指定要遍历的集合 ；自动遍历；遍历出的每一个元素是一个department对象

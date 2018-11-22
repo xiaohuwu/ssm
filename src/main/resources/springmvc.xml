@@ -21,4 +21,25 @@
     <!-- springmvc可以保证动态请求和静态请求都能访问 -->
     <mvc:annotation-driven></mvc:annotation-driven>
 
+
+
+    <!-- conversion-service="conversionService"：使用我们自己配置的类型转换组件 -->
+    <mvc:annotation-driven conversion-service="conversionService"></mvc:annotation-driven>
+
+    <!-- 告诉SpringMVC别用默认的ConversionService，
+            而用我自定义的ConversionService、可能有我们自定义的Converter； -->
+    <!-- 以后写自定义类型转换器的时候，就使用FormattingConversionServiceFactoryBean来注册；
+    既具有类型转换还有格式化功能 -->
+    <bean id="conversionService" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <!--converters转换器中添加我们自定义的类型转换器  -->
+        <property name="converters">
+            <set>
+                <bean class="component.MyStringToEmployeeConverter"></bean>
+            </set>
+        </property>
+    </bean>
+
+
+
+
 </beans>

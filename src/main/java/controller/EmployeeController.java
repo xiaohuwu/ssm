@@ -1,5 +1,10 @@
 package controller;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import component.UserValidator;
 import dao.DepartmentDao;
 import dao.EmployeeDao;
 import model.Department;
@@ -7,11 +12,12 @@ import model.Employee;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.DataBinder;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @Controller
 public class EmployeeController {
@@ -21,6 +27,28 @@ public class EmployeeController {
 
 	@Autowired
 	DepartmentDao departmentDao;
+
+
+
+	/**
+	 * 发送的请求是什么？
+	 *
+	 * quickadd?empinfo=empAdmin-admin@qq.com-1-101
+	 *
+	 * @RequestParam("empinfo")Employee employee; Employee employee =
+	 *                                  request.getParameter("empinfo");
+	 *
+	 *                                  可以通过写一个自定义类型的转换器让其工作；
+	 * @param employee
+	 * @return
+	 */
+	@RequestMapping("/quickadd")
+	public String quickAdd(@RequestParam("empinfo") Employee employee) {
+		System.out.println("封装：" + employee);
+		employeeDao.save(employee);
+		return "redirect:/emps";
+	}
+
 
 	/**
 	 * 查询所有员工
@@ -77,18 +105,43 @@ public class EmployeeController {
 		System.out.println("hahha ");
 	}
 
+	@InitBinder
+	public void initBinder(DataBinder binder) {
+		binder.setValidator(new UserValidator());
+	}
+
+
 	/**
 	 * 保存员工
-	 * 
+	 *http://elim.iteye.com/blog/1812584  自定义参数校验
 	 * @param employee
 	 * @return
 	 */
 	@RequestMapping(value = "/emp", method = RequestMethod.POST)
-	public String addEmp(Employee employee) {
+	public String addEmp(@Valid Employee employee, BindingResult result,
+						 Model model) {
 		System.out.println("要添加的员工：" + employee);
-		employeeDao.save(employee);
-		// 返回列表页面；重定向到查询所有员工的请求
-		return "redirect:/emps";
+		// 获取是否有校验错误
+		boolean hasErrors = result.hasErrors();
+		Map<String, Object> errorsMap = new HashMap<String, Object>();
+		if (hasErrors) {
+			List<FieldError> errors = result.getFieldErrors();
+			for (FieldError fieldError : errors) {
+				System.out.println("错误消息提示：" + fieldError.getDefaultMessage());
+				System.out.println("错误的字段是？" + fieldError.getField());
+				System.out.println(fieldError);
+				System.out.println("------------------------");
+				errorsMap.put(fieldError.getField(),
+						fieldError.getDefaultMessage());
+			}
+			model.addAttribute("errorInfo", errorsMap);
+			System.out.println("有校验错误");
+			return "add";
+		} else {
+			employeeDao.save(employee);
+			// 返回列表页面；重定向到查询所有员工的请求
+			return "redirect:/emps";
+		}
 	}
 
 	/**
