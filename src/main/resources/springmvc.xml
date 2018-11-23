@@ -39,7 +39,9 @@
         </property>
     </bean>
 
-
+    <bean class="view.MyMeiNVViewResolver">
+        <property name="order" value="1"></property>
+    </bean>
 
 
 </beans>
